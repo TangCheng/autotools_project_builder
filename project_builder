@@ -54,7 +54,7 @@ for file in new_files:
 merge_command = 'cd ' + project_path + ' && rsync -avz ' + template_path + '/' + ' ' + project_path
 subprocess.check_call(merge_command, shell=True)
 subprocess.check_call('rm -rf ' + template_path, shell=True)
-subprocess.check_call('rm -rf .git', shell=True)
+subprocess.check_call('rm -rf ' + project_path + '/.git', shell=True)
 
 pattern = '\'s/' + template + '/' + project_name + '/g\''
 for e in valid_dirs:
