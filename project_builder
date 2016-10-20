@@ -22,7 +22,7 @@ template_path = project_path + '/' + template
 
 print project_path
 
-retrieve_command = 'mkdir ' + project_path + ' && cd ' + project_path + ' && cp -a ' + script_path + '/template .'
+retrieve_command = 'mkdir ' + project_path + ' && cd ' + project_path + ' && cp -a ' + script_dir + '/template ' + template
 print retrieve_command
 subprocess.check_call(retrieve_command, shell=True)
 
@@ -41,15 +41,14 @@ for b in valid_dirs:
     for c in other_files:
         new_files.append(trunk + '/' + c)
 
+pattern = '\'s/' + template_label + '/' + project_name + '/g\''
 for file in new_files:
-    pattern = '\'s/' + template + '/' + project_name + '/g\''
     if _platform == "linux" or _platform == "linux2":
         # linux
         replace_command = 'sed -i ' + pattern + ' ' + file
     elif _platform == "darwin":
         # MAC OS X
         replace_command = 'sed -i \'\' ' + pattern + ' ' + file
-    # replace_command = 'sed -i \'\' ' + pattern + ' ' + file
     subprocess.check_call(replace_command, shell=True)
 
 merge_command = 'cd ' + project_path + ' && rsync -avz ' + template_path + '/' + ' ' + project_path
@@ -57,6 +56,7 @@ subprocess.check_call(merge_command, shell=True)
 subprocess.check_call('rm -rf ' + template_path, shell=True)
 subprocess.check_call('rm -rf .git', shell=True)
 
+pattern = '\'s/' + template + '/' + project_name + '/g\''
 for e in valid_dirs:
     rename_command = 'cd ' + project_path + '/' + e + ' && rename ' + pattern + ' *'
     subprocess.check_call(rename_command, shell=True)
