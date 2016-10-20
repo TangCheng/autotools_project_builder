@@ -1,0 +1,62 @@
+#!/usr/bin/python
+
+import subprocess
+import sys
+import os
+from sys import platform as _platform
+
+
+if len(sys.argv) < 2:
+    print 'usage: project_builder <name>'
+    sys.exit()
+
+script_path = os.path.realpath(sys.argv[0])
+script_dir = os.path.dirname(script_path)
+
+project_name = sys.argv[1]
+project_path = os.path.abspath(project_name)
+
+template = 'autotools_project_template'
+template_label = '%' + template + '%'
+template_path = project_path + '/' + template
+
+print project_path
+
+retrieve_command = 'mkdir ' + project_path + ' && cd ' + project_path + ' && cp -a ' + script_path + '/template .'
+print retrieve_command
+subprocess.check_call(retrieve_command, shell=True)
+
+
+print 'project_path: ', project_path
+new_files = []
+trunk, dirs, files = next(os.walk(template_path))
+
+valid_files = filter(lambda a: a[0] != '.', files)
+valid_dirs = filter(lambda a: a[0] != '.', dirs)
+
+for a in valid_files:
+    new_files.append(trunk + '/' + a)
+for b in valid_dirs:
+    trunk, sub_dirs, other_files = next(os.walk(template_path + '/' + b))
+    for c in other_files:
+        new_files.append(trunk + '/' + c)
+
+for file in new_files:
+    pattern = '\'s/' + template + '/' + project_name + '/g\''
+    if _platform == "linux" or _platform == "linux2":
+        # linux
+        replace_command = 'sed -i ' + pattern + ' ' + file
+    elif _platform == "darwin":
+        # MAC OS X
+        replace_command = 'sed -i \'\' ' + pattern + ' ' + file
+    # replace_command = 'sed -i \'\' ' + pattern + ' ' + file
+    subprocess.check_call(replace_command, shell=True)
+
+merge_command = 'cd ' + project_path + ' && rsync -avz ' + template_path + '/' + ' ' + project_path
+subprocess.check_call(merge_command, shell=True)
+subprocess.check_call('rm -rf ' + template_path, shell=True)
+subprocess.check_call('rm -rf .git', shell=True)
+
+for e in valid_dirs:
+    rename_command = 'cd ' + project_path + '/' + e + ' && rename ' + pattern + ' *'
+    subprocess.check_call(rename_command, shell=True)
