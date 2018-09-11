@@ -58,10 +58,11 @@ subprocess.check_call('rm -rf ' + project_path + '/.git', shell=True)
 
 pattern = '\'s/' + template + '/' + project_name + '/g\''
 for e in valid_dirs:
-    if _platform == "linux" or _platform == "linux2":
-        # linux
-        rename_command = 'cd ' + project_path + '/' + e + ' && rename \'' + template  + '\' \'' + project_name + '\' ' + template + '*.*'
-    elif _platform == "darwin":
-        # MAC OS X
-        rename_command = 'cd ' + project_path + '/' + e + ' && rename ' + pattern + ' *'
-    subprocess.check_call(rename_command, shell=True)
+    if os.system('ls ' + project_path + '/' + e + '/' + template + '*') == 0:
+        if _platform == "linux" or _platform == "linux2":
+            # linux
+            rename_command = 'cd ' + project_path + '/' + e + ' && rename \'' + template  + '\' \'' + project_name + '\' ' + template + '*.*'
+        elif _platform == "darwin":
+            # MAC OS X
+            rename_command = 'cd ' + project_path + '/' + e + ' && rename \'' + template + '\' \'' + project_name + '\' *'
+        subprocess.check_call(rename_command, shell=True)
